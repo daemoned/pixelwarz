@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pixelwarz</title>
+  <link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+
+<body>
+  <div id="root">
+    <h1>pixelwarz</h1>
+    <p class="text">
+      A try at making a simple multiplayer game with an authorative server.<br />
+      Move with <span class="hilight">WASD</span> keys, attack with <span class="hilight">Space</span> key, and
+      abilities
+      at <span class="hilight">1,2,3</span> keys.<br />
+      Source code at: <a href="https://github.com/daemoned/pixelwarz">github.com/daemoned/pixelwarz</a>
+    </p>
+    <canvas id="canvas" width="64" height="64"></canvas>
+    <div id="buttons">
+      <button onclick="btn.connect()">Connect</button>
+    </div>
+    <p class="text">
+      <span class="hilight">Connect</span> - Prompts for a name and opens a WebSocket connection so you get realtime
+      updates and can chat.<br />
+      <span class="hilight">Play</span> - Join the game if there is a spot open.<br />
+      <span class="hilight">Disconnect</span> - Closes the WebSocket connection.<br />
+    </p>
+  </div>
+
+  <script src="/client.js"></script>
+</body>
+
+</html>

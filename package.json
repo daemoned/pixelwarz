@@ -1,0 +1,19 @@
+{
+  "name": "pixelwarz",
+  "private": true,
+  "scripts": {
+    "dev": "bun --watch main.ts"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.1.11",
+    "@types/bun": "latest",
+    "tailwindcss": "^4.1.11"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "trustedDependencies": [
+    "@parcel/watcher",
+    "@tailwindcss/oxide"
+  ]
+}
