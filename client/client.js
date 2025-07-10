@@ -1,74 +1,110 @@
-let PLAYING = false;
-let playerName = undefined;
-let ws = null;
+export class Client {
+  #validStates = new Set([
+    "DISCONNECTED",
+    "CONNECTED",
+    "PLAYING",
+    "ERROR"
+  ]);
+  #state = null;
+  #lastState = null;
+  #name = null;
+  url = null;
+  #ws = null;
 
-const btn = btnHandler();
+  constructor(url = "ws://" + window.location.host + "/ws") {
+    // Always start disconnected.
+    this.#state = "DISCONNECTED";
+    this.#lastState = "DISCONNECTED";
+    this.url = url;
+    //this.#name = "Anonymous";
+  }
 
-function connectWebSocket() {
-  ws = new WebSocket("ws://" + window.location.host + "/ws");
-  ws.onopen = () => {
-    ws.send(JSON.stringify({ type: "new", name: playerName }))
-  }
-  ws.onmessage = (event) => {
-    console.log("Received:", event.data);
-  }
-  ws.onclose = () => {
-    btn.timeout();
-  }
-}
-
-function sendChat(text) {
-  ws.send(JSON.stringify({
-    type: "chat",
-    text: text
-  }))
-}
-
-function btnHandler() {
-  const container = document.getElementById("buttons");
-  const clear = () => container.innerHTML = "";
-  const create = (text, onclick) => {
-    const button = document.createElement("button");
-    button.textContent = text;
-    button.onclick = onclick;
-    container.appendChild(button);
-  }
-  return {
-    connect() {
-      if (playerName === undefined || playerName === null) {
-        playerName = prompt("Enter player name:");
-        if (playerName) {
-          connectWebSocket();
-          clear();
-          create("Play", btn.play);
-          create("Disconnect", btn.disconnect);
-        }
-        return;
-      } else {
-        connectWebSocket();
-        clear();
-        create("Play", btn.play);
-        create("Disconnect", btn.disconnect);
+  #dispatchEvent(message) {
+    const event = new CustomEvent("stateChange", {
+      detail: {
+        state: this.#state,
+        lastState: this.#lastState,
+        message: message
       }
-    },
-    play() {
-      console.log("Play pressed.");
-      clear();
-      create("Spectate");
-      create("Disconnect", btn.disconnect);
-    },
-    disconnect() {
-      ws.close();
-      clear();
-      create("Connect", btn.connect);
-    },
-    timeout() {
-      clear();
-      create("Connect", btn.connect);
-      const message = document.createElement("p");
-      message.textContent = "Timeout: You were disconnected. No activity for 5 minutes.";
-      message.style = "color: red";
-      container.appendChild(message);
+    })
+    document.dispatchEvent(event);
+  }
+
+  #setState(newState, message) {
+    if (this.#validStates.has(newState)) {
+      this.#lastState = this.#state;
+      this.#state = newState;
+      this.#dispatchEvent(message);
+      return true;
+    } else {
+      return false;
     }
   }
+
+  getState() {
+    return this.#state;
+  }
+
+  getName() {
+    return this.#name;
+  }
+
+  disconnect() {
+    this.#ws.close();
+    this.#setState("DISCONNECTED");
+  }
+
+  connect() {
+
+    // Check if it's already open or in the process of connecting.
+    if (this.#ws && (this.#ws.readyState === WebSocket.OPEN || this.#ws.readyState === WebSocket.CONNECTING)) {
+      console.warn("WebSocket is already connected or connecting.");
+      return;
+    }
+
+    // Check of there is a name yet and connect.
+    if (this.#name) {
+      this.#ws = new WebSocket(this.url);
+      this.#ws.onopen = () => this.#wsOpen();
+      this.#ws.onclose = (event) => this.#wsClose(event);
+      return true;
+    } else {
+      const name = prompt("Enter player name:");
+      if (name) {
+        this.#name = name;
+        return this.connect();
+      } else {
+        return false;
+      }
+    }
+  }
+
+  #wsOpen() {
+    this.#setState("CONNECTED", `You are connected as ${this.#name}.`);
+    this.#ws.send(JSON.stringify({
+      type: "new",
+      name: this.#name
+    }))
+  }
+
+  #wsClose(event) {
+    // Check if server sent 4000 which we handle as a timeout/inactivity.
+    if (event.code === 4000) {
+      this.#setState("DISCONNECTED", "Timeout: You were inactive for 5 minutes");
+    } else {
+      this.#setState("DISCONNECTED", "You were disconnected.");
+    }
+    return;
+  }
+
+  requestPlay() {
+    // TODO: handle reqesut for a play slot.
+    this.#setState("PLAYING", "You are playing. Good luck!");
+  }
+
+  stopPlay() {
+    // TODO: tell server to stop playing but stay connected for chat and realtime updates
+    this.#setState("CONNECTED", "You left the game.");
+  }
+
 }

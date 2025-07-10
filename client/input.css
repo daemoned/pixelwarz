@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: "Fixedsys Excelsior";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/assets/fsex300.woff2") format("woff2");
+}
+
+@theme {
+  --font-sans: "Fixedsys Excelsior", ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer components {
+
+  /* width */
+  ::-webkit-scrollbar {
+    width: 10px;
+    padding: 2px;
+  }
+
+  /* Track */
+  ::-webkit-scrollbar-track {
+    background: #141414;
+  }
+
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: #404040;
+  }
+
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: #666;
+  }
+}
+
+button {
+  @apply bg-neutral-700 hover:bg-neutral-600 py-0.5 px-3 text-neutral-200 hover:text-white border-2;
+  @apply border-t-white/50 border-l-white/50 border-b-black/25 border-r-black/25;
+}
+
+input {
+  @apply bg-neutral-800 py-0.5 px-3 text-neutral-200 border-2;
+  @apply border-b-white/50 border-r-white/50 border-t-black/15 border-l-black/15;
+  @apply focus:border-white/75;
+}

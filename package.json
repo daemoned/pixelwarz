@@ -2,7 +2,9 @@
   "name": "pixelwarz",
   "private": true,
   "scripts": {
-    "dev": "bun --watch main.ts"
+    "dev:server": "bun --watch main.ts",
+    "dev:client": "bun run build:tailwind --watch ./client/",
+    "build:tailwind": "bunx @tailwindcss/cli -i ./client/input.css -o ./client/assets/output.css"
   },
   "devDependencies": {
     "@tailwindcss/cli": "^4.1.11",

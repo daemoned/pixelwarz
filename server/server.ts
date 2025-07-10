@@ -5,7 +5,7 @@ import type { ClientInfo, ClientMessage } from '../types';
 import { server } from '../main';
 
 export const clients: ClientInfo[] = [];
-const WS_TIMEOUT = 300_000; // 5 min timeout
+const WS_TIMEOUT = 60_000; // 5 min timeout
 
 function addClient(ws: ServerWebSocket<ClientInfo>) {
   const timeoutId = setTimeout(() => {

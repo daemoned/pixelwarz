@@ -1,36 +1,76 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="h-full bg-neutral-900">
 
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>pixelwarz</title>
-  <link rel="stylesheet" type="text/css" href="style.css" />
+  <link rel="stylesheet" type="text/css" href="assets/output.css" />
 </head>
 
-<body>
-  <div id="root">
-    <h1>pixelwarz</h1>
-    <p class="text">
+<body class="h-full">
+  <div id="root" class="flex flex-col h-screen min-h-0 items-center">
+    <header class="w-full text-6xl text-neutral-200 p-2 text-center">
+      pixelwarz
+    </header>
+    <description class="w-full text-sm text-neutral-400 p-2 text-center">
       A try at making a simple multiplayer game with an authorative server.<br />
-      Move with <span class="hilight">WASD</span> keys, attack with <span class="hilight">Space</span> key, and
-      abilities
-      at <span class="hilight">1,2,3</span> keys.<br />
-      Source code at: <a href="https://github.com/daemoned/pixelwarz">github.com/daemoned/pixelwarz</a>
-    </p>
-    <canvas id="canvas" width="64" height="64"></canvas>
-    <div id="buttons">
-      <button onclick="btn.connect()">Connect</button>
-    </div>
-    <p class="text">
-      <span class="hilight">Connect</span> - Prompts for a name and opens a WebSocket connection so you get realtime
-      updates and can chat.<br />
-      <span class="hilight">Play</span> - Join the game if there is a spot open.<br />
-      <span class="hilight">Disconnect</span> - Closes the WebSocket connection.<br />
-    </p>
-  </div>
+      Move with <span class="text-neutral-200">WASD</span> keys, attack with <span class="text-neutral-200">Space</span>
+      key, and abilities at <span class="text-neutral-200">1,2,3</span> keys.<br />
+      Source code at: <a class="text-neutral-200 underline"
+        href="https://github.com/daemoned/pixelwarz">github.com/daemoned/pixelwarz</a> <br />
+      The code is sort of a mess as I
+      have been learning both JavaScript and TypeScript while doing the project.
+    </description>
+    <main class="flex flex-row w-full h-full min-h-0 gap-4 p-8">
+      <left class="flex-1 border-4 border-neutral-600 border-dashed">
+        <div class="flex flex-col h-full flex-none">
+          <div class="w-full border-b-4 border-neutral-600 border-dashed text-center text-neutral-200 bg-neutral-800">
+            Players
+          </div>
+          <div class="h-32"></div>
+          <div
+            class="w-full border-b-4 border-t-4 border-neutral-600 border-dashed text-center text-neutral-200 bg-neutral-800">
+            Spectators
+          </div>
+          <div class="flex-1"></div>
+        </div>
+      </left>
+      <div class="w-[400px] flex flex-col items-center">
+        <canvas id="canvas" width="64" height="64"
+          class="w-[384px] h-[384px] border-4 border-dashed border-neutral-300"></canvas>
+        <div id="buttons" class="flex flex-row gap-2 p-2">
+          <button onclick="client.connect()">Connect</button>
+        </div>
+        <div id="status" class="text-base p-2 text-center">
+        </div>
+        <p class="text-sm text-neutral-400 text-wrap p-2">
+          <span class="text-neutral-200">Connect</span> - Prompts for a name and opens a WebSocket connection so you get
+          realtime updates and can chat.<br />
+          <span class="text-neutral-200">Play</span> - Join the gameplay if there is a spot open.<br />
+          <span class="text-neutral-200">Spectate</span> - Realtime updates and chat but no participation in
+          gameplay.<br />
+          <span class="text-neutral-200">Disconnect</span> - Closes the WebSocket connection.<br />
+        </p>
+      </div>
+      <right class="flex-1 min-h-0 border-4 border-neutral-600 border-dashed h-full">
+        <div class="flex flex-col h-full flex-none">
+          <div class="w-full border-b-4 border-neutral-600 border-dashed text-center text-neutral-200 bg-neutral-800">
+            Chat
+          </div>
+          <div id="chat"
+            class="flex-1 min-h-0 overflow-y-auto flex flex-col p-0.5 m-1 text-sm text-neutral-400 scrollbar">
 
-  <script src="/client.js"></script>
+          </div>
+          <div class="mt-auto flex-none flex items-center gap-2 p-2">
+            <input id="message" type="text" placeholder="Type your message here..." class="w-full">
+            <button onclick="sendChat()">Send</button>
+          </div>
+        </div>
+      </right>
+    </main>
+  </div>
+  <script type="module" src="/app.js"></script>
 </body>
 
 </html>
