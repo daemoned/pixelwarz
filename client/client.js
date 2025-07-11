@@ -49,6 +49,11 @@ export class Client {
     return this.#name;
   }
 
+  setName(name) {
+    this.#name = name;
+    return true;
+  }
+
   disconnect() {
     this.#ws.close();
     this.#setState("DISCONNECTED");
@@ -67,22 +72,18 @@ export class Client {
       this.#ws = new WebSocket(this.url);
       this.#ws.onopen = () => this.#wsOpen();
       this.#ws.onclose = (event) => this.#wsClose(event);
+      this.#ws.onmessage = (event) => this.#wsMessage(event);
       return true;
     } else {
-      const name = prompt("Enter player name:");
-      if (name) {
-        this.#name = name;
-        return this.connect();
-      } else {
-        return false;
-      }
+      return false;
     }
   }
 
   #wsOpen() {
+    // Update state and send our name on connect.
     this.#setState("CONNECTED", `You are connected as ${this.#name}.`);
     this.#ws.send(JSON.stringify({
-      type: "new",
+      type: "NEW",
       name: this.#name
     }))
   }
@@ -97,6 +98,33 @@ export class Client {
     return;
   }
 
+  #wsMessage(event) {
+    // Parse message from server.
+    let parsed;
+    try {
+      parsed = JSON.parse(event.data);
+    } catch {
+      this.#setState("ERROR", "Failed parsing server message.");
+      return;
+    }
+
+    // Handle all types of messages.
+    switch (parsed.type) {
+      case "CHAT":
+        this.#newChat(parsed.name, parsed.message);
+        break;
+      case "ERROR":
+        this.#setState("ERROR", parsed.message);
+        break;
+      case "CLIENTS":
+        this.#newClient(parsed.list);
+        break;
+      default:
+        console.log(parsed);
+        break;
+    }
+  }
+
   requestPlay() {
     // TODO: handle reqesut for a play slot.
     this.#setState("PLAYING", "You are playing. Good luck!");
@@ -105,6 +133,43 @@ export class Client {
   stopPlay() {
     // TODO: tell server to stop playing but stay connected for chat and realtime updates
     this.#setState("CONNECTED", "You left the game.");
+  }
+
+  sendChat(message) {
+    // Check if we have the right state and that the message is not empty or to long.
+    if (
+      (this.getState() === "CONNECTED" || this.getState() === "PLAYING") &&
+      (message.length > 0 && message.length < 255)
+    ) {
+      this.#ws.send(JSON.stringify({
+        type: "CHAT",
+        message: message
+      }));
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  #newChat(name, message) {
+    const event = new CustomEvent("newChat", {
+      detail: {
+        name: name,
+        message: message
+      }
+    })
+    document.dispatchEvent(event);
+    return true;
+  }
+
+  #newClient(list) {
+    const event = new CustomEvent("newClient", {
+      detail: {
+        list: list,
+      }
+    })
+    document.dispatchEvent(event);
+    return true;
   }
 
 }

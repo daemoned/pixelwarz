@@ -12,7 +12,7 @@ function addClient(ws: ServerWebSocket<ClientInfo>) {
     ws.close(4000, "Timeout");
   }, WS_TIMEOUT);
 
-  ws.subscribe("chat");
+  ws.subscribe("clients");
   const client: ClientInfo = { ws, name: "Anonymous", remoteIP: ws.data.remoteIP, connectedAt: Date.now(), timeoutId };
   console.log("New client.");
   clients.push(client);
@@ -50,24 +50,24 @@ export function message(ws: ServerWebSocket<ClientInfo>, message: any) {
   try {
     parsed = JSON.parse(message);
   } catch {
-    ws.send(JSON.stringify({ type: "error", error: "Invalid JSON." }));
+    ws.send(JSON.stringify({ type: "ERROR", message: "Invalid JSON." } as ClientMessage));
     return;
   }
 
   refreshTimeout(ws);
 
   switch (parsed.type) {
-    case "chat":
+    case "CHAT":
       // Broadcast to all clients
-      chatMessage(client!.name, parsed.text);
-      console.log(`CHAT - ${client!.name}: ${parsed.text}`)
+      chatMessage(client!.name, parsed.message);
+      console.log(`CHAT - ${client!.name}: ${parsed.message}`)
       //ws.publish("chat", JSON.stringify({ type: "chat", name: ""}));
       break;
-    case "new":
+    case "NEW":
       if (client) {
         client.name = parsed.name;
+        newClient();
       }
-      //newPlayer(clientID, parsed.name);
       break;
 
   }
@@ -77,6 +77,15 @@ export function message(ws: ServerWebSocket<ClientInfo>, message: any) {
 
 export function close(ws: ServerWebSocket<ClientInfo>) {
   removeClient(ws);
+  newClient();
+}
+
+function newClient() {
+  const list = clients.map(client => client.name);
+  server.publish("clients", JSON.stringify({
+    type: "CLIENTS",
+    list: list
+  } as ClientMessage))
 }
 
 /*
@@ -88,11 +97,10 @@ function newPlayer(clientID: string, name: string) {
   console.log(players);
 }*/
 
-function chatMessage(name: string, text: string) {
-  server.publish("chat", JSON.stringify({
-    type: "chat",
+function chatMessage(name: string, message: string) {
+  server.publish("clients", JSON.stringify({
+    type: "CHAT",
     name,
-    text,
+    message,
   } as ClientMessage))
-  console.log("TODO: Handle chat message...")
 }

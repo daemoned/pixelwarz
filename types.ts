@@ -9,5 +9,7 @@ export type ClientInfo = {
 };
 
 export type ClientMessage =
-  | { type: "chat"; name: string, text: string }
-  | { type: "new"; name: string }
+  | { type: "CHAT"; name: string, message: string }
+  | { type: "NEW"; name: string }
+  | { type: "ERROR"; message: string }
+  | { type: "CLIENTS"; list: Array<string> }
