@@ -20,7 +20,7 @@ export function gameLoop() {
 
   const now = Date.now();
   if (now - lastInputTime >= 100) {
-    if (input.isPressed()) {
+    if (input.isPressed() && !gui.chatFocus()) {
       const keys = input.getKeys();
       input.getKeys
       //console.log(keys[keys.length - 1]);

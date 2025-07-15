@@ -1,7 +1,7 @@
 import { server } from "../main";
 import { players } from "./server";
 
-const colors: string[] = ["#ff6900", "#00c950", "#2b7fff", "e12afb"] as const;
+const colors: string[] = ["#ff0000", "#ffff00", "#008000", "0000ff"] as const;
 let availableColors = [...colors];
 let inUseColors: string[] = [];
 

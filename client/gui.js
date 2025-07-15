@@ -67,6 +67,14 @@ export class GUI {
     this.#statusDiv.appendChild(status);
   }
 
+  chatFocus() {
+    if (document.activeElement === this.#messageInput) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   renderButtons(event) {
     this.#clear(this.#buttonsDiv);
     switch (event.state) {
@@ -151,7 +159,8 @@ export class GUI {
     const name = prompt("Enter player name, max 16 characters.");
     if (name && name.length > 0 && name.length < 16) {
       this.#client.setName(name);
-      this.renderButtons({ state: "DISCONNECTED" });
+      this.#client.connect();
+      //this.renderButtons({ state: "DISCONNECTED" });
       return true;
     } else {
       alert("Name must be atleast 1 character and max 16 characters.");

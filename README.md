@@ -6,5 +6,5 @@ Code is mess... I'm trying to learn both JavaScript and TypeScript at the same t
 ## Todo
 - Server: Fix fixed tickrate.
 - Client: Only send move updates when state/key changes.
-- Client: Remove Input from gamestate when chatbox is active.
+- ~~Client: Remove Input from gamestate when chatbox is active.~~
 - Client/Server: Update and show active players with their colors.

@@ -116,7 +116,12 @@ export function close(ws: ServerWebSocket<ClientInfo>) {
 
 function move(ws: ServerWebSocket<ClientInfo>, key: string | null) {
   const player = players.find((p) => p.clientInfo.ws === ws);
-  player!.key = key;
+  if (player) {
+    player!.key = key;
+  } else {
+    return;
+  }
+
   gameLoop();
   //console.log(`${player?.clientInfo.name}:move:${key} position:${player?.position}`);
 }
