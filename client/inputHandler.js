@@ -4,13 +4,13 @@ export class InputHandler {
   // actions
   #pressed = new Set();
 
-  constructor(document) {
-    this.document = document;
+  constructor() {
+
   }
 
   init() {
-    this.document.addEventListener("keydown", (event) => this.#keyDown(event));
-    this.document.addEventListener("keyup", (event) => this.#keyUp(event));
+    document.addEventListener("keydown", (event) => this.#keyDown(event));
+    document.addEventListener("keyup", (event) => this.#keyUp(event));
   }
   #keyDown(event) {
     const key = event.key.toLowerCase();

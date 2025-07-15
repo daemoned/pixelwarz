@@ -1,6 +1,6 @@
 // main.ts: Starts basic webserver to serve html and javascripts and passes on websocket handling to server.ts
 
-import { message, open, close, clients } from "./server/server";
+import { message, open, close, clients, players } from "./server/server";
 
 async function httpRequest(req: Request, server: Bun.Server): Promise<Response | undefined> {
   const url = new URL(req.url);
@@ -64,5 +64,7 @@ process.stdin.on("data", (key: string) => {
     process.exit();
   } else if (key === "c") {
     console.log(Bun.inspect.table(clients, ["remoteIP", "name", "connectedAt"]))
+  } else if (key === "p") {
+    console.log(players);
   }
 })

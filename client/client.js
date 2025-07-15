@@ -1,4 +1,7 @@
+import { gameLoop } from "./app.js";
+
 export class Client {
+
   #validStates = new Set([
     "DISCONNECTED",
     "CONNECTED",
@@ -10,6 +13,7 @@ export class Client {
   #name = null;
   url = null;
   #ws = null;
+  #gameState = null;
 
   constructor(url = "ws://" + window.location.host + "/ws") {
     // Always start disconnected.
@@ -119,6 +123,12 @@ export class Client {
       case "CLIENTS":
         this.#newClient(parsed.list);
         break;
+      case "PLAYING":
+        this.#handlePlay(parsed.color);
+        break;
+      case "GAME":
+        this.#gameState = parsed.data;
+        break;
       default:
         console.log(parsed);
         break;
@@ -126,11 +136,38 @@ export class Client {
   }
 
   requestPlay() {
-    // TODO: handle reqesut for a play slot.
-    this.#setState("PLAYING", "You are playing. Good luck!");
+    this.#ws.send(JSON.stringify({
+      type: "REQUEST_PLAY"
+    }))
+  }
+
+  getGameState() {
+    return this.#gameState;
+  }
+
+  #handlePlay(color) {
+    if (color) {
+      this.#setState("PLAYING", "You are playing. Good luck!");
+      console.log(color);
+      gameLoop();
+    } else {
+      this.#setState("CONNECTED", "Sorry. No more slots in game.");
+    }
+  }
+
+  move(input) {
+    if (this.getState() === "PLAYING") {
+      this.#ws.send(JSON.stringify({
+        type: "MOVE",
+        key: input
+      }))
+    }
   }
 
   stopPlay() {
+    this.#ws.send(JSON.stringify({
+      type: "STOP_PLAY"
+    }));
     // TODO: tell server to stop playing but stay connected for chat and realtime updates
     this.#setState("CONNECTED", "You left the game.");
   }

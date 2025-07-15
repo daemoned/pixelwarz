@@ -1,11 +1,12 @@
 import { randomUUIDv7, type ServerWebSocket } from 'bun';
-import { players } from "./player";
-import type { Player } from "./player"
-import type { ClientInfo, ClientMessage } from '../types';
+import type { ClientInfo, ClientMessage, Player } from '../types';
 import { server } from '../main';
+import { gameLoop, getColor, releaseColor } from './game';
 
 export const clients: ClientInfo[] = [];
-const WS_TIMEOUT = 60_000; // 5 min timeout
+export const players: Player[] = [];
+const WS_TIMEOUT = 300_000; // 5 min timeout
+const MAX_PLAYERS = 4;
 
 function addClient(ws: ServerWebSocket<ClientInfo>) {
   const timeoutId = setTimeout(() => {
@@ -69,6 +70,38 @@ export function message(ws: ServerWebSocket<ClientInfo>, message: any) {
         newClient();
       }
       break;
+    case "REQUEST_PLAY":
+      if (players.length < MAX_PLAYERS) {
+        // request a color
+        const color = getColor();
+        ws.subscribe("players");
+        players.push({
+          clientInfo: client!,
+          color: color!,
+          key: null,
+          position: { x: 0, y: 0 }
+        });
+        ws.send(JSON.stringify({
+          type: "PLAYING",
+          color: color
+        } as ClientMessage));
+
+      } else {
+        // return message with color as null
+        ws.send(JSON.stringify({
+          type: "PLAYING",
+          color: null
+        } as ClientMessage));
+      }
+      break;
+    case "STOP_PLAY":
+      removePlayer(ws);
+      break;
+    case "MOVE":
+      move(ws, parsed.key);
+      break;
+
+
 
   }
   //console.log(`WebSocket message: ${message}`);
@@ -76,8 +109,23 @@ export function message(ws: ServerWebSocket<ClientInfo>, message: any) {
 }
 
 export function close(ws: ServerWebSocket<ClientInfo>) {
+  removePlayer(ws);
   removeClient(ws);
   newClient();
+}
+
+function move(ws: ServerWebSocket<ClientInfo>, key: string | null) {
+  const player = players.find((p) => p.clientInfo.ws === ws);
+  player!.key = key;
+  gameLoop();
+  //console.log(`${player?.clientInfo.name}:move:${key} position:${player?.position}`);
+}
+
+function removePlayer(ws: ServerWebSocket<ClientInfo>) {
+  ws.unsubscribe("players");
+  const index = players.findIndex((p) => p.clientInfo.ws === ws);
+  releaseColor(players[index]?.color!);
+  players.splice(index, 1);
 }
 
 function newClient() {
