@@ -17,6 +17,7 @@ export type ClientMessage =
   | { type: "STOP_PLAY"; }
   | { type: "PLAYING"; color: string | null }
   | { type: "MOVE"; key: string | null }
+  | { type: "PLAYERS"; list: Array<object> }
 
 export type Player = {
   clientInfo: ClientInfo;

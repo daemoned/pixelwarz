@@ -68,6 +68,7 @@ export function message(ws: ServerWebSocket<ClientInfo>, message: any) {
       if (client) {
         client.name = parsed.name;
         newClient();
+        updatePlayers();
       }
       break;
     case "REQUEST_PLAY":
@@ -85,6 +86,7 @@ export function message(ws: ServerWebSocket<ClientInfo>, message: any) {
           type: "PLAYING",
           color: color
         } as ClientMessage));
+        updatePlayers();
 
       } else {
         // return message with color as null
@@ -96,6 +98,7 @@ export function message(ws: ServerWebSocket<ClientInfo>, message: any) {
       break;
     case "STOP_PLAY":
       removePlayer(ws);
+      updatePlayers();
       break;
     case "MOVE":
       move(ws, parsed.key);
@@ -111,6 +114,7 @@ export function message(ws: ServerWebSocket<ClientInfo>, message: any) {
 export function close(ws: ServerWebSocket<ClientInfo>) {
   removePlayer(ws);
   removeClient(ws);
+  updatePlayers();
   newClient();
 }
 
@@ -122,6 +126,14 @@ function move(ws: ServerWebSocket<ClientInfo>, key: string | null) {
     return;
   }
   //console.log(`${player?.clientInfo.name}:move:${key} position:${player?.position}`);
+}
+
+function updatePlayers() {
+  const list = players.map(player => ({ name: player.clientInfo.name, color: player.color }))
+  server.publish("clients", JSON.stringify({
+    type: "PLAYERS",
+    list: list
+  }))
 }
 
 function removePlayer(ws: ServerWebSocket<ClientInfo>) {

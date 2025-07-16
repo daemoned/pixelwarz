@@ -124,6 +124,9 @@ export class Client {
       case "CLIENTS":
         this.#newClient(parsed.list);
         break;
+      case "PLAYERS":
+        this.#updatePlayers(parsed.list);
+        break;
       case "PLAYING":
         this.#handlePlay(parsed.color);
         break;
@@ -209,6 +212,15 @@ export class Client {
     })
     document.dispatchEvent(event);
     return true;
+  }
+
+  #updatePlayers(list) {
+    const event = new CustomEvent("updatePlayers", {
+      detail: {
+        list: list,
+      }
+    })
+    document.dispatchEvent(event);
   }
 
 }

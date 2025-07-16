@@ -36,8 +36,9 @@ export class GUI {
     // Handle new chat messages.
     document.addEventListener("newChat", (event) => this.newChat(event.detail));
 
-    // Handle new clients.
+    // Handle new clients and players.
     document.addEventListener("newClient", (event) => this.newClient(event.detail));
+    document.addEventListener("updatePlayers", (event) => this.updatePlayers(event.detail));
 
   }
 
@@ -153,6 +154,21 @@ export class GUI {
       this.#clientsDiv.appendChild(span);
     });
     return true;
+  }
+
+  updatePlayers(obj) {
+    const list = obj.list;
+    this.#playersDiv.innerHTML = "";
+    list.forEach(item => {
+      const span = document.createElement("span");
+      span.textContent = item.name;
+      span.classList.add("bg-neutral-800");
+      //span.classList.add("text-neutral-400");
+      span.classList.add("px-3");
+      span.classList.add("py-1");
+      span.style.color = item.color;
+      this.#playersDiv.appendChild(span);
+    });
   }
 
   setName() {
