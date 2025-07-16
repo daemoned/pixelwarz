@@ -14,6 +14,7 @@ export class Client {
   url = null;
   #ws = null;
   #gameState = null;
+  #previousInput = null;
 
   constructor(url = "ws://" + window.location.host + "/ws") {
     // Always start disconnected.
@@ -156,7 +157,8 @@ export class Client {
   }
 
   move(input) {
-    if (this.getState() === "PLAYING") {
+    if (this.getState() === "PLAYING" && input !== this.#previousInput) {
+      this.#previousInput = input;
       this.#ws.send(JSON.stringify({
         type: "MOVE",
         key: input

@@ -4,8 +4,8 @@ The server is written in TypeScript with Bun as the runtime.
 Code is mess... I'm trying to learn both JavaScript and TypeScript at the same time.
 
 ## Todo
-- Server: Fix fixed tickrate.
+- ~~Server: Fix fixed tickrate.~~
 - Server: Only send updates when gamestate has changed.
-- Client: Only send move updates when state/key changes.
+- ~~Client: Only send move updates when state/key changes.~~
 - ~~Client: Remove Input from gamestate when chatbox is active.~~
 - Client/Server: Update and show active players with their colors.
