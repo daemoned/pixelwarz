@@ -1,5 +1,6 @@
 // main.ts: Starts basic webserver to serve html and javascripts and passes on websocket handling to server.ts
 
+import { timeLoop } from "./server/game";
 import { message, open, close, clients, players } from "./server/server";
 
 async function httpRequest(req: Request, server: Bun.Server): Promise<Response | undefined> {
@@ -68,3 +69,5 @@ process.stdin.on("data", (key: string) => {
     console.log(players);
   }
 })
+
+timeLoop();

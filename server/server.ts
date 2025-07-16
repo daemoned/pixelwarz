@@ -121,8 +121,6 @@ function move(ws: ServerWebSocket<ClientInfo>, key: string | null) {
   } else {
     return;
   }
-
-  gameLoop();
   //console.log(`${player?.clientInfo.name}:move:${key} position:${player?.position}`);
 }
 
